@@ -1,0 +1,2444 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hệ thống ERP - Quản lý doanh nghiệp toàn diện</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8fafc;
+        color: #334155;
+        line-height: 1.6;
+      }
+
+      /* Loading Overlay */
+      .loading {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .loading.active {
+        display: flex;
+      }
+
+      .loading-content {
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .spinner {
+        width: 24px;
+        height: 24px;
+        border: 2px solid #e2e8f0;
+        border-top: 2px solid #3b82f6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Login Screen */
+      .login-screen {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      .login-card {
+        background: white;
+        padding: 48px;
+        border-radius: 16px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .login-header {
+        text-align: center;
+        margin-bottom: 32px;
+      }
+
+      .login-logo {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        border-radius: 50%;
+        margin: 0 auto 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+      }
+
+      .login-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #1e293b;
+        margin-bottom: 8px;
+      }
+
+      .login-subtitle {
+        color: #64748b;
+      }
+
+      .form-group {
+        margin-bottom: 24px;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 8px;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.2s;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      .btn-primary {
+        width: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.2s;
+      }
+
+      .btn-primary:hover {
+        opacity: 0.9;
+      }
+
+      .demo-accounts {
+        margin-top: 24px;
+        text-align: center;
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      /* Main Application */
+      .main-app {
+        display: none;
+      }
+
+      .main-app.active {
+        display: block;
+      }
+
+      /* Header */
+      .header {
+        background: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid #e5e7eb;
+        position: sticky;
+        top: 0;
+        z-index: 40;
+      }
+
+      .header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 24px;
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .sidebar-toggle {
+        display: none;
+        background: none;
+        border: none;
+        color: #6b7280;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      .app-logo {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+
+      .app-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #1e293b;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .notification-btn {
+        position: relative;
+        background: none;
+        border: none;
+        color: #6b7280;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 8px;
+        transition: color 0.2s;
+      }
+
+      .notification-btn:hover {
+        color: #3b82f6;
+      }
+
+      .notification-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        background: #ef4444;
+        color: white;
+        font-size: 12px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        background: #3b82f6;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 14px;
+      }
+
+      .user-name {
+        color: #374151;
+        font-weight: 500;
+      }
+
+      .logout-btn {
+        background: none;
+        border: none;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 4px;
+        transition: color 0.2s;
+      }
+
+      .logout-btn:hover {
+        color: #ef4444;
+      }
+
+      /* Layout */
+      .app-layout {
+        display: flex;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 256px;
+        background: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        height: calc(100vh - 80px);
+        overflow-y: auto;
+        position: sticky;
+        top: 80px;
+        transition: transform 0.3s;
+      }
+
+      .sidebar-nav {
+        padding: 16px;
+      }
+
+      .sidebar-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 8px;
+        color: #374151;
+      }
+
+      .sidebar-item:hover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .sidebar-item.active {
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+
+      .sidebar-item i {
+        margin-right: 12px;
+        width: 20px;
+      }
+
+      /* Main Content */
+      .main-content {
+        flex: 1;
+        padding: 24px;
+        overflow-y: auto;
+      }
+
+      .module-content {
+        display: none;
+      }
+
+      .module-content.active {
+        display: block;
+      }
+
+      /* Page Header */
+      .page-header {
+        margin-bottom: 24px;
+      }
+
+      .page-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #1e293b;
+        margin-bottom: 8px;
+      }
+
+      .page-subtitle {
+        color: #64748b;
+      }
+
+      /* Stats Cards */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 24px;
+        margin-bottom: 32px;
+      }
+
+      .stat-card {
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .stat-card.blue {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+      }
+
+      .stat-card.green {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+      }
+
+      .stat-card.orange {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+      }
+
+      .stat-card.purple {
+        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        color: white;
+      }
+
+      .stat-card.red {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+      }
+
+      .stat-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .stat-info h3 {
+        font-size: 12px;
+        opacity: 0.8;
+        margin-bottom: 4px;
+      }
+
+      .stat-info .value {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 4px;
+      }
+
+      .stat-info .change {
+        font-size: 12px;
+        opacity: 0.8;
+      }
+
+      .stat-icon {
+        font-size: 32px;
+        opacity: 0.6;
+      }
+
+      /* Content Grid */
+      .content-grid {
+        display: grid;
+        gap: 24px;
+        margin-bottom: 32px;
+      }
+
+      .content-grid.two-cols {
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      }
+
+      .content-grid.three-cols {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      }
+
+      .content-grid.four-cols {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      }
+
+      /* Cards */
+      .card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-header {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .card-header i {
+        color: #3b82f6;
+      }
+
+      /* Tables */
+      .table-container {
+        overflow-x: auto;
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .data-table th {
+        background-color: #f9fafb;
+        font-weight: 600;
+        color: #374151;
+      }
+
+      .data-table tr:hover {
+        background-color: #f9fafb;
+      }
+
+      /* Status Badges */
+      .status-badge {
+        padding: 4px 8px;
+        font-size: 12px;
+        border-radius: 9999px;
+        font-weight: 500;
+      }
+
+      .status-new {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+
+      .status-processing {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .status-shipping {
+        background: #fde68a;
+        color: #92400e;
+      }
+
+      .status-completed {
+        background: #d1fae5;
+        color: #065f46;
+      }
+
+      .status-cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      .status-pending {
+        background: #f3e8ff;
+        color: #7c3aed;
+      }
+
+      /* Progress Bar */
+      .progress-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .progress-bar {
+        flex: 1;
+        background-color: #e5e7eb;
+        border-radius: 4px;
+        overflow: hidden;
+        height: 8px;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #3b82f6, #10b981);
+        transition: width 0.3s ease;
+      }
+
+      .progress-text {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      /* Activity Items */
+      .activity-list {
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .activity-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+      }
+
+      .activity-item.blue {
+        background: #dbeafe;
+      }
+
+      .activity-item.green {
+        background: #d1fae5;
+      }
+
+      .activity-item.orange {
+        background: #fed7aa;
+      }
+
+      .activity-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-top: 8px;
+        flex-shrink: 0;
+      }
+
+      .activity-dot.blue {
+        background: #3b82f6;
+      }
+
+      .activity-dot.green {
+        background: #10b981;
+      }
+
+      .activity-dot.orange {
+        background: #f59e0b;
+      }
+
+      .activity-content h4 {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 2px;
+      }
+
+      .activity-content p {
+        font-size: 12px;
+        color: #6b7280;
+        margin-bottom: 2px;
+      }
+
+      .activity-content .time {
+        font-size: 12px;
+        color: #9ca3af;
+      }
+
+      /* Alert Boxes */
+      .alert {
+        padding: 12px;
+        border-radius: 8px;
+        border-left: 4px solid;
+        margin-bottom: 12px;
+      }
+
+      .alert.red {
+        background: #fef2f2;
+        border-color: #ef4444;
+      }
+
+      .alert.yellow {
+        background: #fffbeb;
+        border-color: #f59e0b;
+      }
+
+      .alert.blue {
+        background: #eff6ff;
+        border-color: #3b82f6;
+      }
+
+      .alert h4 {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+
+      .alert.red h4 {
+        color: #991b1b;
+      }
+
+      .alert.yellow h4 {
+        color: #92400e;
+      }
+
+      .alert.blue h4 {
+        color: #1e40af;
+      }
+
+      .alert p {
+        font-size: 12px;
+      }
+
+      .alert.red p {
+        color: #dc2626;
+      }
+
+      .alert.yellow p {
+        color: #d97706;
+      }
+
+      .alert.blue p {
+        color: #2563eb;
+      }
+
+      /* KPI Progress */
+      .kpi-item {
+        margin-bottom: 16px;
+      }
+
+      .kpi-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        margin-bottom: 4px;
+      }
+
+      .kpi-value {
+        font-weight: 500;
+      }
+
+      /* Buttons */
+      .btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: all 0.2s;
+        font-size: 14px;
+      }
+
+      .btn.blue {
+        color: #3b82f6;
+      }
+
+      .btn.blue:hover {
+        color: #1d4ed8;
+        background: #dbeafe;
+      }
+
+      .btn.green {
+        color: #10b981;
+      }
+
+      .btn.green:hover {
+        color: #059669;
+        background: #d1fae5;
+      }
+
+      .btn.orange {
+        color: #f59e0b;
+      }
+
+      .btn.orange:hover {
+        color: #d97706;
+        background: #fed7aa;
+      }
+
+      .btn.purple {
+        color: #8b5cf6;
+      }
+
+      .btn.purple:hover {
+        color: #7c3aed;
+        background: #f3e8ff;
+      }
+
+      /* Feature Cards */
+      .feature-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 16px;
+        cursor: pointer;
+        transition: border-color 0.2s;
+      }
+
+      .feature-card:hover {
+        border-color: #3b82f6;
+      }
+
+      .feature-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .feature-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .feature-icon.blue {
+        background: #dbeafe;
+        color: #3b82f6;
+      }
+
+      .feature-icon.green {
+        background: #d1fae5;
+        color: #10b981;
+      }
+
+      .feature-icon.red {
+        background: #fee2e2;
+        color: #ef4444;
+      }
+
+      .feature-icon.purple {
+        background: #f3e8ff;
+        color: #8b5cf6;
+      }
+
+      .feature-icon.orange {
+        background: #fed7aa;
+        color: #f59e0b;
+      }
+
+      .feature-text h4 {
+        font-weight: 500;
+        margin-bottom: 2px;
+      }
+
+      .feature-text p {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      /* Chart Container */
+      .chart-container {
+        position: relative;
+        height: 300px;
+      }
+
+      /* Notifications */
+      .notification-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+      }
+
+      .notification {
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        margin-bottom: 8px;
+        animation: slideIn 0.3s ease-out;
+        color: white;
+      }
+
+      .notification.success {
+        background: #10b981;
+      }
+
+      .notification.error {
+        background: #ef4444;
+      }
+
+      .notification.warning {
+        background: #f59e0b;
+      }
+
+      .notification.info {
+        background: #3b82f6;
+      }
+
+      .notification-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .notification-close {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        margin-left: 16px;
+        opacity: 0.8;
+      }
+
+      .notification-close:hover {
+        opacity: 1;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(100%);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      /* Responsive Design */
+      @media (max-width: 1024px) {
+        .sidebar-toggle {
+          display: block;
+        }
+
+        .sidebar {
+          position: fixed;
+          left: 0;
+          top: 80px;
+          height: calc(100vh - 80px);
+          z-index: 30;
+          transform: translateX(-100%);
+        }
+
+        .sidebar.open {
+          transform: translateX(0);
+        }
+
+        .sidebar-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 20;
+          display: none;
+        }
+
+        .sidebar-overlay.active {
+          display: block;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .content-grid.two-cols {
+          grid-template-columns: 1fr;
+        }
+
+        .content-grid.three-cols {
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .content-grid.four-cols {
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+      }
+
+      @media (max-width: 768px) {
+        .header-content {
+          padding: 12px 16px;
+        }
+
+        .main-content {
+          padding: 16px;
+        }
+
+        .login-card {
+          padding: 32px 24px;
+          margin: 16px;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .content-grid.three-cols,
+        .content-grid.four-cols {
+          grid-template-columns: 1fr;
+        }
+
+        .page-title {
+          font-size: 24px;
+        }
+
+        .data-table {
+          font-size: 14px;
+        }
+
+        .data-table th,
+        .data-table td {
+          padding: 8px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .user-name {
+          display: none;
+        }
+
+        .app-title {
+          display: none;
+        }
+
+        .stat-card {
+          padding: 16px;
+        }
+
+        .card {
+          padding: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading">
+      <div class="loading-content">
+        <div class="spinner"></div>
+        <span>Đang tải...</span>
+      </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+      <div class="login-card">
+        <div class="login-header">
+          <div class="login-logo">
+            <i class="fas fa-industry"></i>
+          </div>
+          <h1 class="login-title">Hệ thống ERP</h1>
+          <p class="login-subtitle">Quản lý doanh nghiệp thông minh</p>
+        </div>
+
+        <form onsubmit="login(event)">
+          <div class="form-group">
+            <label class="form-label">Tên đăng nhập</label>
+            <input
+              type="text"
+              id="username"
+              class="form-input"
+              placeholder="Nhập tên đăng nhập"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mật khẩu</label>
+            <input
+              type="password"
+              id="password"
+              class="form-input"
+              placeholder="Nhập mật khẩu"
+              required
+            />
+          </div>
+
+          <button type="submit" class="btn-primary">Đăng nhập</button>
+        </form>
+
+        <div class="demo-accounts">
+          <p><strong>Tài khoản demo:</strong></p>
+          <p>admin / admin (Quản trị viên)</p>
+          <p>user / user (Người dùng)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="main-app">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-content">
+          <div class="header-left">
+            <button id="sidebarToggle" class="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+            <div class="app-logo">
+              <i class="fas fa-industry"></i>
+            </div>
+            <h1 class="app-title">Hệ thống ERP</h1>
+          </div>
+
+          <div class="header-right">
+            <button id="notificationBtn" class="notification-btn">
+              <i class="fas fa-bell"></i>
+              <span class="notification-badge">3</span>
+            </button>
+
+            <div class="user-info">
+              <div class="user-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <span class="user-name" id="currentUser">Admin</span>
+              <button onclick="logout()" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="app-layout">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+          <nav class="sidebar-nav">
+            <div class="sidebar-item active" onclick="showModule('dashboard')">
+              <i class="fas fa-tachometer-alt"></i>
+              <span>Dashboard</span>
+            </div>
+
+            <div class="sidebar-item" onclick="showModule('production')">
+              <i class="fas fa-cogs"></i>
+              <span>Quản trị sản xuất</span>
+            </div>
+
+            <div class="sidebar-item" onclick="showModule('warehouse')">
+              <i class="fas fa-warehouse"></i>
+              <span>Quản lý kho</span>
+            </div>
+
+            <div class="sidebar-item" onclick="showModule('shipping')">
+              <i class="fas fa-truck"></i>
+              <span>Quản lý vận chuyển</span>
+            </div>
+
+            <div class="sidebar-item" onclick="showModule('sales')">
+              <i class="fas fa-chart-line"></i>
+              <span>Quản lý bán hàng</span>
+            </div>
+
+            <div class="sidebar-item" onclick="showModule('finance')">
+              <i class="fas fa-dollar-sign"></i>
+              <span>Tài chính - Kế toán</span>
+            </div>
+
+            <div class="sidebar-item" onclick="showModule('hr')">
+              <i class="fas fa-users"></i>
+              <span>Quản lý nhân sự</span>
+            </div>
+
+            <div class="sidebar-item" onclick="showModule('system')">
+              <i class="fas fa-cog"></i>
+              <span>Quản trị hệ thống</span>
+            </div>
+          </nav>
+        </aside>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+          <!-- Dashboard Module -->
+          <div id="dashboard" class="module-content active">
+            <div class="page-header">
+              <h2 class="page-title">Dashboard - Bảng điều khiển</h2>
+              <p class="page-subtitle">Tổng quan hoạt động doanh nghiệp</p>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="stats-grid">
+              <div class="stat-card blue">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Doanh thu tháng</h3>
+                    <div class="value">2.5 tỷ VNĐ</div>
+                    <div class="change">↗ +15% so với tháng trước</div>
+                  </div>
+                  <i class="fas fa-chart-line stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card green">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Đơn hàng</h3>
+                    <div class="value">1,247</div>
+                    <div class="change">↗ +8% so với tháng trước</div>
+                  </div>
+                  <i class="fas fa-shopping-cart stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card orange">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Tồn kho</h3>
+                    <div class="value">85%</div>
+                    <div class="change">Mức an toàn</div>
+                  </div>
+                  <i class="fas fa-boxes stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card purple">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Hiệu suất SX</h3>
+                    <div class="value">92%</div>
+                    <div class="change">Mục tiêu: 90%</div>
+                  </div>
+                  <i class="fas fa-industry stat-icon"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Charts and Analytics -->
+            <div class="content-grid two-cols">
+              <div class="card">
+                <h3 class="card-header">Doanh thu 12 tháng</h3>
+                <div class="chart-container">
+                  <canvas id="revenueChart"></canvas>
+                </div>
+              </div>
+
+              <div class="card">
+                <h3 class="card-header">Phân bổ sản phẩm</h3>
+                <div class="chart-container">
+                  <canvas id="productChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="content-grid three-cols">
+              <div class="card">
+                <h3 class="card-header">
+                  <i class="fas fa-clock"></i>
+                  Hoạt động gần đây
+                </h3>
+                <div class="activity-list">
+                  <div class="activity-item blue">
+                    <div class="activity-dot blue"></div>
+                    <div class="activity-content">
+                      <h4>Đơn hàng mới</h4>
+                      <p>Đơn hàng #DH001 từ Công ty ABC</p>
+                      <div class="time">2 phút trước</div>
+                    </div>
+                  </div>
+                  <div class="activity-item green">
+                    <div class="activity-dot green"></div>
+                    <div class="activity-content">
+                      <h4>Sản xuất hoàn thành</h4>
+                      <p>Lệnh sản xuất LSX001 hoàn thành</p>
+                      <div class="time">15 phút trước</div>
+                    </div>
+                  </div>
+                  <div class="activity-item orange">
+                    <div class="activity-dot orange"></div>
+                    <div class="activity-content">
+                      <h4>Nhập kho</h4>
+                      <p>Nhập 500 sản phẩm A vào kho</p>
+                      <div class="time">30 phút trước</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <h3 class="card-header">
+                  <i class="fas fa-exclamation-triangle"></i>
+                  Cảnh báo hệ thống
+                </h3>
+                <div class="alert red">
+                  <h4>Tồn kho thấp</h4>
+                  <p>Sản phẩm B chỉ còn 50 cái</p>
+                </div>
+                <div class="alert yellow">
+                  <h4>Bảo trì máy móc</h4>
+                  <p>Máy ép A1 cần bảo trì định kỳ</p>
+                </div>
+                <div class="alert blue">
+                  <h4>Đơn hàng chờ duyệt</h4>
+                  <p>5 đơn hàng cần phê duyệt</p>
+                </div>
+              </div>
+
+              <div class="card">
+                <h3 class="card-header">
+                  <i class="fas fa-chart-bar"></i>
+                  KPI tháng này
+                </h3>
+                <div class="kpi-item">
+                  <div class="kpi-header">
+                    <span>Doanh thu</span>
+                    <span class="kpi-value">85%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: 85%"></div>
+                  </div>
+                </div>
+                <div class="kpi-item">
+                  <div class="kpi-header">
+                    <span>Sản xuất</span>
+                    <span class="kpi-value">92%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: 92%"></div>
+                  </div>
+                </div>
+                <div class="kpi-item">
+                  <div class="kpi-header">
+                    <span>Chất lượng</span>
+                    <span class="kpi-value">98%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: 98%"></div>
+                  </div>
+                </div>
+                <div class="kpi-item">
+                  <div class="kpi-header">
+                    <span>Giao hàng đúng hạn</span>
+                    <span class="kpi-value">88%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: 88%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Production Module -->
+          <div id="production" class="module-content">
+            <div class="page-header">
+              <h2 class="page-title">Quản trị sản xuất</h2>
+              <p class="page-subtitle">Quản lý toàn bộ quy trình sản xuất</p>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card blue">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Lệnh đang SX</h3>
+                    <div class="value">23</div>
+                    <div class="change">Tổng 45 lệnh</div>
+                  </div>
+                  <i class="fas fa-cogs stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card green">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Hiệu suất</h3>
+                    <div class="value">92%</div>
+                    <div class="change">Mục tiêu: 90%</div>
+                  </div>
+                  <i class="fas fa-chart-line stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card orange">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Chất lượng</h3>
+                    <div class="value">98.5%</div>
+                    <div class="change">Đạt chuẩn</div>
+                  </div>
+                  <i class="fas fa-award stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card purple">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Máy hoạt động</h3>
+                    <div class="value">18/20</div>
+                    <div class="change">2 máy bảo trì</div>
+                  </div>
+                  <i class="fas fa-tools stat-icon"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-header">Lệnh sản xuất</h3>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Mã lệnh</th>
+                      <th>Sản phẩm</th>
+                      <th>Số lượng</th>
+                      <th>Tiến độ</th>
+                      <th>Ngày bắt đầu</th>
+                      <th>Hạn hoàn thành</th>
+                      <th>Trạng thái</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>LSX001</strong></td>
+                      <td>Sản phẩm A</td>
+                      <td>1,000 cái</td>
+                      <td>
+                        <div class="progress-container">
+                          <div class="progress-bar">
+                            <div class="progress-fill" style="width: 85%"></div>
+                          </div>
+                          <span class="progress-text">85%</span>
+                        </div>
+                      </td>
+                      <td>20/12/2024</td>
+                      <td>25/12/2024</td>
+                      <td>
+                        <span class="status-badge status-processing"
+                          >Đang thực hiện</span
+                        >
+                      </td>
+                      <td>
+                        <button
+                          class="btn blue"
+                          onclick="showNotification('Xem chi tiết LSX001!', 'info')"
+                        >
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button
+                          class="btn green"
+                          onclick="showNotification('Cập nhật tiến độ LSX001!', 'success')"
+                        >
+                          <i class="fas fa-edit"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>LSX002</strong></td>
+                      <td>Sản phẩm B</td>
+                      <td>500 cái</td>
+                      <td>
+                        <div class="progress-container">
+                          <div class="progress-bar">
+                            <div
+                              class="progress-fill"
+                              style="width: 100%"
+                            ></div>
+                          </div>
+                          <span class="progress-text">100%</span>
+                        </div>
+                      </td>
+                      <td>18/12/2024</td>
+                      <td>22/12/2024</td>
+                      <td>
+                        <span class="status-badge status-completed"
+                          >Hoàn thành</span
+                        >
+                      </td>
+                      <td>
+                        <button
+                          class="btn blue"
+                          onclick="showNotification('Xem chi tiết LSX002!', 'info')"
+                        >
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button
+                          class="btn green"
+                          onclick="showNotification('Xuất kho LSX002!', 'success')"
+                        >
+                          <i class="fas fa-truck"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Warehouse Module -->
+          <div id="warehouse" class="module-content">
+            <div class="page-header">
+              <h2 class="page-title">Quản lý kho</h2>
+              <p class="page-subtitle">Quản lý xuất nhập kho và tồn kho</p>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card blue">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Tổng tồn kho</h3>
+                    <div class="value">15,847</div>
+                    <div class="change">Sản phẩm</div>
+                  </div>
+                  <i class="fas fa-boxes stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card green">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Nhập kho hôm nay</h3>
+                    <div class="value">1,250</div>
+                    <div class="change">Sản phẩm</div>
+                  </div>
+                  <i class="fas fa-arrow-down stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card orange">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Xuất kho hôm nay</h3>
+                    <div class="value">980</div>
+                    <div class="change">Sản phẩm</div>
+                  </div>
+                  <i class="fas fa-arrow-up stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card red">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Cảnh báo tồn kho</h3>
+                    <div class="value">12</div>
+                    <div class="change">Sản phẩm</div>
+                  </div>
+                  <i class="fas fa-exclamation-triangle stat-icon"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-header">Danh sách tồn kho</h3>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Mã sản phẩm</th>
+                      <th>Tên sản phẩm</th>
+                      <th>Số lượng tồn</th>
+                      <th>Mức tối thiểu</th>
+                      <th>Trạng thái</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>SP001</strong></td>
+                      <td>Sản phẩm A</td>
+                      <td style="color: #ef4444; font-weight: bold">45</td>
+                      <td>100</td>
+                      <td>
+                        <span
+                          class="status-badge"
+                          style="background: #fee2e2; color: #991b1b"
+                          >Thiếu hàng</span
+                        >
+                      </td>
+                      <td>
+                        <button
+                          class="btn blue"
+                          onclick="showNotification('Nhập kho SP001!', 'info')"
+                        >
+                          <i class="fas fa-plus"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>SP002</strong></td>
+                      <td>Sản phẩm B</td>
+                      <td style="color: #10b981; font-weight: bold">850</td>
+                      <td>200</td>
+                      <td>
+                        <span
+                          class="status-badge"
+                          style="background: #d1fae5; color: #065f46"
+                          >Đủ hàng</span
+                        >
+                      </td>
+                      <td>
+                        <button
+                          class="btn orange"
+                          onclick="showNotification('Xuất kho SP002!', 'warning')"
+                        >
+                          <i class="fas fa-minus"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shipping Module -->
+          <div id="shipping" class="module-content">
+            <div class="page-header">
+              <h2 class="page-title">Quản lý vận chuyển</h2>
+              <p class="page-subtitle">Theo dõi và quản lý giao hàng</p>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card blue">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Đang giao hàng</h3>
+                    <div class="value">45</div>
+                    <div class="change">Đơn hàng</div>
+                  </div>
+                  <i class="fas fa-truck stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card green">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Giao thành công</h3>
+                    <div class="value">1,234</div>
+                    <div class="change">Tháng này</div>
+                  </div>
+                  <i class="fas fa-check-circle stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card orange">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Chờ xử lý</h3>
+                    <div class="value">23</div>
+                    <div class="change">Đơn hàng</div>
+                  </div>
+                  <i class="fas fa-clock stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card red">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Giao thất bại</h3>
+                    <div class="value">8</div>
+                    <div class="change">Cần xử lý</div>
+                  </div>
+                  <i class="fas fa-exclamation-triangle stat-icon"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-header">Danh sách đơn giao hàng</h3>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Mã đơn</th>
+                      <th>Khách hàng</th>
+                      <th>Địa chỉ giao</th>
+                      <th>Tài xế</th>
+                      <th>Ngày giao</th>
+                      <th>Trạng thái</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>DH001</strong></td>
+                      <td>Công ty ABC</td>
+                      <td>123 Đường ABC, Quận 1, TP.HCM</td>
+                      <td>Nguyễn Văn A</td>
+                      <td>22/12/2024</td>
+                      <td>
+                        <span class="status-badge status-shipping"
+                          >Đang giao</span
+                        >
+                      </td>
+                      <td>
+                        <button
+                          class="btn blue"
+                          onclick="showNotification('Theo dõi đơn hàng DH001!', 'info')"
+                        >
+                          <i class="fas fa-map-marker-alt"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>DH002</strong></td>
+                      <td>Công ty XYZ</td>
+                      <td>456 Đường XYZ, Quận 3, TP.HCM</td>
+                      <td>Chưa phân công</td>
+                      <td>23/12/2024</td>
+                      <td>
+                        <span class="status-badge status-pending"
+                          >Chờ xử lý</span
+                        >
+                      </td>
+                      <td>
+                        <button
+                          class="btn orange"
+                          onclick="showNotification('Phân công tài xế cho DH002!', 'warning')"
+                        >
+                          <i class="fas fa-user-plus"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sales Module -->
+          <div id="sales" class="module-content">
+            <div class="page-header">
+              <h2 class="page-title">Quản lý bán hàng</h2>
+              <p class="page-subtitle">Quản lý đơn hàng và khách hàng</p>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card blue">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Doanh số tháng</h3>
+                    <div class="value">2.5 tỷ</div>
+                    <div class="change">↗ +15% so với tháng trước</div>
+                  </div>
+                  <i class="fas fa-chart-line stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card green">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Đơn hàng mới</h3>
+                    <div class="value">156</div>
+                    <div class="change">Tuần này</div>
+                  </div>
+                  <i class="fas fa-shopping-cart stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card orange">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Khách hàng</h3>
+                    <div class="value">1,247</div>
+                    <div class="change">+23 khách mới</div>
+                  </div>
+                  <i class="fas fa-users stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card purple">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Tỷ lệ chuyển đổi</h3>
+                    <div class="value">68%</div>
+                    <div class="change">Từ báo giá</div>
+                  </div>
+                  <i class="fas fa-percentage stat-icon"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-header">Đơn hàng bán hàng</h3>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Mã đơn</th>
+                      <th>Khách hàng</th>
+                      <th>Sản phẩm</th>
+                      <th>Số lượng</th>
+                      <th>Giá trị</th>
+                      <th>Ngày đặt</th>
+                      <th>Trạng thái</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>DH001</strong></td>
+                      <td>Công ty ABC</td>
+                      <td>Sản phẩm A</td>
+                      <td>500</td>
+                      <td style="font-weight: 500; color: #10b981">
+                        250 triệu VNĐ
+                      </td>
+                      <td>20/12/2024</td>
+                      <td>
+                        <span class="status-badge status-processing"
+                          >Đang xử lý</span
+                        >
+                      </td>
+                      <td>
+                        <button
+                          class="btn blue"
+                          onclick="showNotification('Xem chi tiết DH001!', 'info')"
+                        >
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button
+                          class="btn green"
+                          onclick="showNotification('Duyệt đơn hàng DH001!', 'success')"
+                        >
+                          <i class="fas fa-check"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>DH002</strong></td>
+                      <td>Công ty XYZ</td>
+                      <td>Sản phẩm B</td>
+                      <td>300</td>
+                      <td style="font-weight: 500; color: #10b981">
+                        180 triệu VNĐ
+                      </td>
+                      <td>19/12/2024</td>
+                      <td>
+                        <span class="status-badge status-completed"
+                          >Hoàn thành</span
+                        >
+                      </td>
+                      <td>
+                        <button
+                          class="btn blue"
+                          onclick="showNotification('Xem chi tiết DH002!', 'info')"
+                        >
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button
+                          class="btn purple"
+                          onclick="showNotification('In hóa đơn DH002!', 'info')"
+                        >
+                          <i class="fas fa-print"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Finance Module -->
+          <div id="finance" class="module-content">
+            <div class="page-header">
+              <h2 class="page-title">Tài chính - Kế toán</h2>
+              <p class="page-subtitle">
+                Quản lý tài chính và kế toán doanh nghiệp
+              </p>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card green">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Doanh thu tháng</h3>
+                    <div class="value">2.5 tỷ</div>
+                    <div class="change">↗ +15% so với tháng trước</div>
+                  </div>
+                  <i class="fas fa-chart-line stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card red">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Chi phí tháng</h3>
+                    <div class="value">1.8 tỷ</div>
+                    <div class="change">↗ +8% so với tháng trước</div>
+                  </div>
+                  <i class="fas fa-chart-bar stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card blue">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Lợi nhuận tháng</h3>
+                    <div class="value">700 triệu</div>
+                    <div class="change">Tỷ suất: 28%</div>
+                  </div>
+                  <i class="fas fa-coins stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card purple">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Dòng tiền</h3>
+                    <div class="value">1.2 tỷ</div>
+                    <div class="change">Tình trạng: Tốt</div>
+                  </div>
+                  <i class="fas fa-money-bill-wave stat-icon"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-header">Báo cáo tài chính</h3>
+              <div class="content-grid four-cols">
+                <div
+                  class="feature-card"
+                  onclick="showNotification('Xem báo cáo doanh thu!', 'info')"
+                >
+                  <div class="feature-content">
+                    <div class="feature-icon green">
+                      <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="feature-text">
+                      <h4>Báo cáo doanh thu</h4>
+                      <p>Tháng 12/2024</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="feature-card"
+                  onclick="showNotification('Xem báo cáo lợi nhuận!', 'info')"
+                >
+                  <div class="feature-content">
+                    <div class="feature-icon blue">
+                      <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="feature-text">
+                      <h4>Báo cáo lợi nhuận</h4>
+                      <p>Quý 4/2024</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="feature-card"
+                  onclick="showNotification('Xem bảng cân đối kế toán!', 'info')"
+                >
+                  <div class="feature-content">
+                    <div class="feature-icon purple">
+                      <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <div class="feature-text">
+                      <h4>Bảng cân đối KT</h4>
+                      <p>31/12/2024</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="feature-card"
+                  onclick="showNotification('Xem báo cáo dòng tiền!', 'info')"
+                >
+                  <div class="feature-content">
+                    <div class="feature-icon orange">
+                      <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="feature-text">
+                      <h4>Báo cáo dòng tiền</h4>
+                      <p>Tháng 12/2024</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HR Module -->
+          <div id="hr" class="module-content">
+            <div class="page-header">
+              <h2 class="page-title">Quản lý nhân sự</h2>
+              <p class="page-subtitle">Quản lý nhân viên và hoạt động HR</p>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card blue">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Tổng nhân viên</h3>
+                    <div class="value">247</div>
+                    <div class="change">+5 nhân viên mới</div>
+                  </div>
+                  <i class="fas fa-users stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card green">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Có mặt hôm nay</h3>
+                    <div class="value">235</div>
+                    <div class="change">Tỷ lệ: 95.1%</div>
+                  </div>
+                  <i class="fas fa-user-check stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card orange">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Đang nghỉ phép</h3>
+                    <div class="value">8</div>
+                    <div class="change">3 nghỉ ốm</div>
+                  </div>
+                  <i class="fas fa-calendar-times stat-icon"></i>
+                </div>
+              </div>
+
+              <div class="stat-card purple">
+                <div class="stat-content">
+                  <div class="stat-info">
+                    <h3>Vị trí tuyển dụng</h3>
+                    <div class="value">12</div>
+                    <div class="change">Đang tuyển</div>
+                  </div>
+                  <i class="fas fa-user-plus stat-icon"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-header">Danh sách nhân viên</h3>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Mã NV</th>
+                      <th>Họ tên</th>
+                      <th>Chức vụ</th>
+                      <th>Phòng ban</th>
+                      <th>Email</th>
+                      <th>Trạng thái</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>NV001</strong></td>
+                      <td>Nguyễn Văn A</td>
+                      <td>Trưởng phòng IT</td>
+                      <td>Công nghệ thông tin</td>
+                      <td>nva@company.com</td>
+                      <td>
+                        <span
+                          class="status-badge"
+                          style="background: #d1fae5; color: #065f46"
+                          >Đang làm việc</span
+                        >
+                      </td>
+                      <td>
+                        <button
+                          class="btn blue"
+                          onclick="showNotification('Xem hồ sơ Nguyễn Văn A!', 'info')"
+                        >
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button
+                          class="btn green"
+                          onclick="showNotification('Chỉnh sửa thông tin!', 'info')"
+                        >
+                          <i class="fas fa-edit"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>NV002</strong></td>
+                      <td>Trần Thị B</td>
+                      <td>Kế toán trưởng</td>
+                      <td>Kế toán</td>
+                      <td>ttb@company.com</td>
+                      <td>
+                        <span
+                          class="status-badge"
+                          style="background: #d1fae5; color: #065f46"
+                          >Đang làm việc</span
+                        >
+                      </td>
+                      <td>
+                        <button
+                          class="btn blue"
+                          onclick="showNotification('Xem hồ sơ Trần Thị B!', 'info')"
+                        >
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button
+                          class="btn green"
+                          onclick="showNotification('Chỉnh sửa thông tin!', 'info')"
+                        >
+                          <i class="fas fa-edit"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- System Module -->
+          <div id="system" class="module-content">
+            <div class="page-header">
+              <h2 class="page-title">Quản trị hệ thống</h2>
+              <p class="page-subtitle">Cấu hình và quản trị hệ thống</p>
+            </div>
+
+            <div class="content-grid three-cols">
+              <div class="card">
+                <h3 class="card-header">Quản lý người dùng</h3>
+                <div
+                  class="feature-card"
+                  onclick="showNotification('Tính năng thêm người dùng!', 'info')"
+                >
+                  <div class="feature-content">
+                    <div class="feature-icon blue">
+                      <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="feature-text">
+                      <h4>Thêm người dùng mới</h4>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="feature-card"
+                  onclick="showNotification('Tính năng phân quyền!', 'info')"
+                >
+                  <div class="feature-content">
+                    <div class="feature-icon green">
+                      <i class="fas fa-key"></i>
+                    </div>
+                    <div class="feature-text">
+                      <h4>Phân quyền hệ thống</h4>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="feature-card"
+                  onclick="showNotification('Tính năng quản lý nhóm!', 'info')"
+                >
+                  <div class="feature-content">
+                    <div class="feature-icon purple">
+                      <i class="fas fa-users-cog"></i>
+                    </div>
+                    <div class="feature-text">
+                      <h4>Quản lý nhóm người dùng</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <h3 class="card-header">Cấu hình hệ thống</h3>
+                <div
+                  class="feature-card"
+                  onclick="showNotification('Tính năng cấu hình chung!', 'info')"
+                >
+                  <div class="feature-content">
+                    <div class="feature-icon blue">
+                      <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="feature-text">
+                      <h4>Cấu hình chung</h4>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="feature-card"
+                  onclick="showNotification('Tính năng sao lưu dữ liệu!', 'info')"
+                >
+                  <div class="feature-content">
+                    <div class="feature-icon green">
+                      <i class="fas fa-database"></i>
+                    </div>
+                    <div class="feature-text">
+                      <h4>Sao lưu dữ liệu</h4>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="feature-card"
+                  onclick="showNotification('Tính năng bảo mật!', 'info')"
+                >
+                  <div class="feature-content">
+                    <div class="feature-icon red">
+                      <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="feature-text">
+                      <h4>Cài đặt bảo mật</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <h3 class="card-header">Nhật ký hệ thống</h3>
+                <div class="activity-list">
+                  <div class="activity-item blue">
+                    <div class="activity-dot blue"></div>
+                    <div class="activity-content">
+                      <h4>Đăng nhập thành công</h4>
+                      <p>Admin - 10:30 AM</p>
+                    </div>
+                  </div>
+                  <div class="activity-item green">
+                    <div class="activity-dot green"></div>
+                    <div class="activity-content">
+                      <h4>Tạo đơn hàng mới</h4>
+                      <p>User - 10:15 AM</p>
+                    </div>
+                  </div>
+                  <div class="activity-item orange">
+                    <div class="activity-dot orange"></div>
+                    <div class="activity-content">
+                      <h4>Cập nhật tồn kho</h4>
+                      <p>System - 10:00 AM</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      let currentUser = null;
+      let currentModule = "dashboard";
+
+      // Sample data
+      const users = {
+        admin: { password: "admin", role: "admin", name: "Admin" },
+        user: { password: "user", role: "user", name: "User" },
+      };
+
+      function login(event) {
+        event.preventDefault();
+        showLoading();
+
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        // Simulate loading time
+        setTimeout(() => {
+          hideLoading();
+
+          if (users[username] && users[username].password === password) {
+            currentUser = users[username];
+            document.getElementById("currentUser").textContent =
+              currentUser.name;
+            document.getElementById("loginScreen").style.display = "none";
+            document.getElementById("mainApp").classList.add("active");
+            showNotification(
+              "Đăng nhập thành công! Chào mừng " + currentUser.name,
+              "success"
+            );
+            initializeCharts();
+          } else {
+            showNotification(
+              "Tên đăng nhập hoặc mật khẩu không đúng! Thử: admin/admin hoặc user/user",
+              "error"
+            );
+          }
+        }, 1000);
+      }
+
+      function logout() {
+        currentUser = null;
+        document.getElementById("loginScreen").style.display = "flex";
+        document.getElementById("mainApp").classList.remove("active");
+        document.getElementById("username").value = "";
+        document.getElementById("password").value = "";
+        showNotification("Đã đăng xuất thành công!", "info");
+      }
+
+      function showLoading() {
+        document.getElementById("loadingOverlay").classList.add("active");
+      }
+
+      function hideLoading() {
+        document.getElementById("loadingOverlay").classList.remove("active");
+      }
+
+      function showNotification(message, type = "info") {
+        const container = document.getElementById("notificationContainer");
+        const notification = document.createElement("div");
+
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+                <div class="notification-content">
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="notification-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+
+        container.appendChild(notification);
+
+        setTimeout(() => {
+          if (notification.parentElement) {
+            notification.remove();
+          }
+        }, 5000);
+      }
+
+      function showModule(moduleName) {
+        // Hide all modules
+        document.querySelectorAll(".module-content").forEach((module) => {
+          module.classList.remove("active");
+        });
+
+        // Show selected module
+        document.getElementById(moduleName).classList.add("active");
+
+        // Update sidebar active state
+        document.querySelectorAll(".sidebar-item").forEach((item) => {
+          item.classList.remove("active");
+        });
+
+        event.target.closest(".sidebar-item").classList.add("active");
+        currentModule = moduleName;
+
+        // Close sidebar on mobile
+        if (window.innerWidth < 1024) {
+          toggleSidebar();
+        }
+      }
+
+      function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("sidebarOverlay");
+
+        sidebar.classList.toggle("open");
+        overlay.classList.toggle("active");
+      }
+
+      function initializeCharts() {
+        // Revenue Chart
+        const revenueCtx = document.getElementById("revenueChart");
+        if (revenueCtx) {
+          new Chart(revenueCtx, {
+            type: "line",
+            data: {
+              labels: [
+                "T1",
+                "T2",
+                "T3",
+                "T4",
+                "T5",
+                "T6",
+                "T7",
+                "T8",
+                "T9",
+                "T10",
+                "T11",
+                "T12",
+              ],
+              datasets: [
+                {
+                  label: "Doanh thu (tỷ VNĐ)",
+                  data: [
+                    1.8, 2.1, 1.9, 2.3, 2.0, 2.4, 2.2, 2.6, 2.3, 2.7, 2.4, 2.5,
+                  ],
+                  borderColor: "#3b82f6",
+                  backgroundColor: "rgba(59, 130, 246, 0.1)",
+                  tension: 0.4,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false,
+                },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                },
+              },
+            },
+          });
+        }
+
+        // Product Chart
+        const productCtx = document.getElementById("productChart");
+        if (productCtx) {
+          new Chart(productCtx, {
+            type: "doughnut",
+            data: {
+              labels: ["Sản phẩm A", "Sản phẩm B", "Sản phẩm C", "Khác"],
+              datasets: [
+                {
+                  data: [35, 25, 20, 20],
+                  backgroundColor: ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"],
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: "bottom",
+                },
+              },
+            },
+          });
+        }
+      }
+
+      // Event listeners
+      document.addEventListener("DOMContentLoaded", function () {
+        // Sidebar toggle
+        document
+          .getElementById("sidebarToggle")
+          .addEventListener("click", toggleSidebar);
+
+        // Sidebar overlay click
+        document
+          .getElementById("sidebarOverlay")
+          .addEventListener("click", toggleSidebar);
+      });
+    </script>
+    <script>
+      (function () {
+        function c() {
+          var b = a.contentDocument || a.contentWindow.document;
+          if (b) {
+            var d = b.createElement("script");
+            d.innerHTML =
+              "window.__CF$cv$params={r:'9889126554ea0540',t:'MTc1OTQ1OTE5Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName("head")[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement("iframe");
+          a.height = 1;
+          a.width = 1;
+          a.style.position = "absolute";
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = "none";
+          a.style.visibility = "hidden";
+          document.body.appendChild(a);
+          if ("loading" !== document.readyState) c();
+          else if (window.addEventListener)
+            document.addEventListener("DOMContentLoaded", c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              "loading" !== document.readyState &&
+                ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>

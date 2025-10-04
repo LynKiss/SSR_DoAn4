@@ -1,0 +1,53 @@
+/* System styles */
+.system-header {
+  margin-bottom: 1.5rem;
+}
+
+.system-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #1a202c;
+}
+
+.system-title.dark {
+  color: white;
+}
+
+.system-subtitle {
+  color: #718096;
+}
+
+.system-subtitle.dark {
+  color: #d1d5db;
+}
+
+.system-card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.system-card.dark {
+  background-color: #2d3748;
+}
+
+.system-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1a202c;
+}
+
+.system-card-title.dark {
+  color: white;
+}
+
+.system-card-text {
+  color: #718096;
+}
+
+.system-card-text.dark {
+  color: #d1d5db;
+}

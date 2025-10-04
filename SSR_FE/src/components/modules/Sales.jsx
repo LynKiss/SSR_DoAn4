@@ -1,15 +1,26 @@
+import useTheme from "../../hooks/useTheme";
+import "./Sales.css";
+
 const Sales = () => {
+  const { isDarkMode } = useTheme();
+
   return (
     <div id="sales" className="module-content">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+      <div className="sales-header">
+        <h2 className={`sales-title ${isDarkMode ? "dark" : ""}`}>
           Quản lý bán hàng
         </h2>
-        <p className="text-gray-600">Quản lý đơn hàng và khách hàng</p>
+        <p className={`sales-subtitle ${isDarkMode ? "dark" : ""}`}>
+          Quản lý đơn hàng và khách hàng
+        </p>
       </div>
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <h3 className="text-lg font-semibold mb-4">Tình hình bán hàng</h3>
-        <p className="text-gray-600">Chức năng đang được phát triển...</p>
+      <div className={`sales-card ${isDarkMode ? "dark" : ""}`}>
+        <h3 className={`sales-card-title ${isDarkMode ? "dark" : ""}`}>
+          Tình hình bán hàng
+        </h3>
+        <p className={`sales-card-text ${isDarkMode ? "dark" : ""}`}>
+          Chức năng đang được phát triển...
+        </p>
       </div>
     </div>
   );

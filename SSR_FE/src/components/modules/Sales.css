@@ -1,0 +1,53 @@
+/* Sales styles */
+.sales-header {
+  margin-bottom: 1.5rem;
+}
+
+.sales-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #1a202c;
+}
+
+.sales-title.dark {
+  color: white;
+}
+
+.sales-subtitle {
+  color: #718096;
+}
+
+.sales-subtitle.dark {
+  color: #d1d5db;
+}
+
+.sales-card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.sales-card.dark {
+  background-color: #2d3748;
+}
+
+.sales-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1a202c;
+}
+
+.sales-card-title.dark {
+  color: white;
+}
+
+.sales-card-text {
+  color: #718096;
+}
+
+.sales-card-text.dark {
+  color: #d1d5db;
+}
