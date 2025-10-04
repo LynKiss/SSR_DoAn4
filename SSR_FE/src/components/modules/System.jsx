@@ -1,15 +1,26 @@
+import useTheme from "../../hooks/useTheme";
+import "./System.css";
+
 const System = () => {
+  const { isDarkMode } = useTheme();
+
   return (
     <div id="system" className="module-content">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+      <div className="system-header">
+        <h2 className={`system-title ${isDarkMode ? "dark" : ""}`}>
           Quản trị hệ thống
         </h2>
-        <p className="text-gray-600">Cấu hình và quản lý hệ thống</p>
+        <p className={`system-subtitle ${isDarkMode ? "dark" : ""}`}>
+          Cấu hình và quản lý hệ thống
+        </p>
       </div>
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <h3 className="text-lg font-semibold mb-4">Cài đặt hệ thống</h3>
-        <p className="text-gray-600">Chức năng đang được phát triển...</p>
+      <div className={`system-card ${isDarkMode ? "dark" : ""}`}>
+        <h3 className={`system-card-title ${isDarkMode ? "dark" : ""}`}>
+          Cài đặt hệ thống
+        </h3>
+        <p className={`system-card-text ${isDarkMode ? "dark" : ""}`}>
+          Chức năng đang được phát triển...
+        </p>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import useTheme from "../hooks/useTheme";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import Dashboard from "./modules/Dashboard";
@@ -9,9 +10,14 @@ import Sales from "./modules/Sales";
 import Finance from "./modules/Finance";
 import HR from "./modules/HR";
 import System from "./modules/System";
+import "./MainApp.css";
 
 const MainApp = ({ currentUser, onLogout }) => {
+  const { isDarkMode } = useTheme();
   const [currentModule, setCurrentModule] = useState("dashboard");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => setSidebarOpen((s) => !s);
 
   const renderModule = () => {
     switch (currentModule) {
@@ -37,14 +43,24 @@ const MainApp = ({ currentUser, onLogout }) => {
   };
 
   return (
-    <div>
-      <Header currentUser={currentUser} onLogout={onLogout} />
-      <div className="flex">
+    <div className={`main-app ${isDarkMode ? "dark" : ""}`}>
+      <Header
+        currentUser={currentUser}
+        onLogout={onLogout}
+        className={`main-header ${isDarkMode ? "dark" : ""}`}
+        toggleSidebar={toggleSidebar}
+      />
+      <div style={{ display: "flex", flex: 1 }}>
         <Sidebar
           currentModule={currentModule}
           setCurrentModule={setCurrentModule}
+          className={`main-sidebar ${isDarkMode ? "dark" : ""}`}
+          sidebarOpen={sidebarOpen}
+          closeSidebar={() => setSidebarOpen(false)}
         />
-        <main className="flex-1 p-6 overflow-y-auto">{renderModule()}</main>
+        <main className={`main-content ${isDarkMode ? "dark" : ""}`}>
+          {renderModule()}
+        </main>
       </div>
     </div>
   );

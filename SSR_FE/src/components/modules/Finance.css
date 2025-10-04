@@ -1,0 +1,53 @@
+/* Finance styles */
+.finance-header {
+  margin-bottom: 1.5rem;
+}
+
+.finance-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #1a202c;
+}
+
+.finance-title.dark {
+  color: white;
+}
+
+.finance-subtitle {
+  color: #718096;
+}
+
+.finance-subtitle.dark {
+  color: #d1d5db;
+}
+
+.finance-card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.finance-card.dark {
+  background-color: #2d3748;
+}
+
+.finance-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1a202c;
+}
+
+.finance-card-title.dark {
+  color: white;
+}
+
+.finance-card-text {
+  color: #718096;
+}
+
+.finance-card-text.dark {
+  color: #d1d5db;
+}
