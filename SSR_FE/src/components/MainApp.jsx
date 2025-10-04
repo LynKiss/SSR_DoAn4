@@ -15,6 +15,9 @@ import "./MainApp.css";
 const MainApp = ({ currentUser, onLogout }) => {
   const { isDarkMode } = useTheme();
   const [currentModule, setCurrentModule] = useState("dashboard");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => setSidebarOpen((s) => !s);
 
   const renderModule = () => {
     switch (currentModule) {
@@ -45,12 +48,15 @@ const MainApp = ({ currentUser, onLogout }) => {
         currentUser={currentUser}
         onLogout={onLogout}
         className={`main-header ${isDarkMode ? "dark" : ""}`}
+        toggleSidebar={toggleSidebar}
       />
       <div style={{ display: "flex", flex: 1 }}>
         <Sidebar
           currentModule={currentModule}
           setCurrentModule={setCurrentModule}
           className={`main-sidebar ${isDarkMode ? "dark" : ""}`}
+          sidebarOpen={sidebarOpen}
+          closeSidebar={() => setSidebarOpen(false)}
         />
         <main className={`main-content ${isDarkMode ? "dark" : ""}`}>
           {renderModule()}

@@ -1,7 +1,7 @@
 import useTheme from "../hooks/useTheme";
 import "./Sidebar.css";
 
-const Sidebar = ({ currentModule, setCurrentModule }) => {
+const Sidebar = ({ currentModule, setCurrentModule, sidebarOpen, closeSidebar }) => {
   const { isDarkMode, toggleDarkMode } = useTheme();
 
   const menuItems = [
@@ -16,8 +16,9 @@ const Sidebar = ({ currentModule, setCurrentModule }) => {
   ];
 
   return (
-    <aside className={`sidebar ${isDarkMode ? "dark" : ""}`}>
-      <nav className="sidebar-nav">
+    <>
+      <aside className={`sidebar ${isDarkMode ? "dark" : ""} ${sidebarOpen ? "open" : ""}`}>
+        <nav className="sidebar-nav">
         <div className="sidebar-menu">
           {menuItems.map((item) => (
             <div
@@ -25,15 +26,21 @@ const Sidebar = ({ currentModule, setCurrentModule }) => {
               className={`sidebar-item ${isDarkMode ? "dark" : ""} ${
                 currentModule === item.id ? "active" : ""
               }`}
-              onClick={() => setCurrentModule(item.id)}
+              onClick={() => {
+                setCurrentModule(item.id);
+                if (closeSidebar) closeSidebar();
+              }}
             >
               <i className={item.icon}></i>
               <span>{item.label}</span>
             </div>
           ))}
         </div>
-      </nav>
-    </aside>
+        </nav>
+      </aside>
+
+      <div className={`sidebar-overlay ${sidebarOpen ? "active" : ""}`} onClick={closeSidebar}></div>
+    </>
   );
 };
 
