@@ -1,0 +1,334 @@
+/* Sidebar Styles - Classic and Clean Design */
+
+.main-sidebar {
+  width: 280px;
+  height: calc(100vh - 64px);
+  background: var(--white);
+  border-right: 1px solid var(--gray-200);
+  position: fixed;
+  top: 64px;
+  left: 0;
+  z-index: 90;
+  transform: translateX(0);
+  transition: transform var(--transition-normal);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gray-300) transparent;
+
+  [data-theme="dark"] & {
+    background: var(--dark-surface);
+    border-color: var(--dark-border);
+  }
+
+  &.dark {
+    background: var(--dark-surface);
+    border-color: var(--dark-border);
+  }
+
+  // Scrollbar styles
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 3px;
+
+    [data-theme="dark"] & {
+      background: var(--dark-border);
+    }
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-400);
+
+    [data-theme="dark"] & {
+      background: var(--gray-500);
+    }
+  }
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 80;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-normal);
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.sidebar-header {
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--gray-200);
+
+  [data-theme="dark"] & {
+    border-color: var(--dark-border);
+  }
+}
+
+.sidebar-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: var(--spacing-xs);
+
+  [data-theme="dark"] & {
+    color: var(--dark-text);
+  }
+}
+
+.sidebar-subtitle {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+
+  [data-theme="dark"] & {
+    color: var(--dark-text-secondary);
+  }
+}
+
+.sidebar-menu {
+  padding: var(--spacing-md) 0;
+}
+
+.sidebar-nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-nav-item {
+  margin: 0 var(--spacing-md) var(--spacing-xs);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.sidebar-nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  color: var(--gray-600);
+  text-decoration: none;
+  border-radius: var(--radius-lg);
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all var(--transition-fast);
+  position: relative;
+
+  &:hover {
+    background: var(--gray-50);
+    color: var(--gray-800);
+    transform: translateX(4px);
+
+    [data-theme="dark"] & {
+      background: var(--dark-bg);
+      color: var(--dark-text);
+    }
+  }
+
+  &.active {
+    background: var(--primary-color);
+    color: var(--white);
+    box-shadow: var(--shadow-sm);
+
+    &:hover {
+      transform: translateX(0);
+      background: var(--primary-dark);
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--white);
+      border-radius: 0 2px 2px 0;
+    }
+  }
+}
+
+.sidebar-nav-icon {
+  font-size: 1.125rem;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-nav-text {
+  flex: 1;
+  font-weight: 500;
+}
+
+.sidebar-nav-badge {
+  background: var(--error-color);
+  color: var(--white);
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+  min-width: 18px;
+  text-align: center;
+}
+
+.sidebar-section {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--gray-200);
+
+  [data-theme="dark"] & {
+    border-color: var(--dark-border);
+  }
+
+  &:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+}
+
+.sidebar-section-title {
+  padding: 0 var(--spacing-lg);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gray-400);
+  margin-bottom: var(--spacing-sm);
+
+  [data-theme="dark"] & {
+    color: var(--gray-500);
+  }
+}
+
+.sidebar-footer {
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--gray-200);
+  margin-top: auto;
+
+  [data-theme="dark"] & {
+    border-color: var(--dark-border);
+  }
+}
+
+.sidebar-footer-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.sidebar-footer-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-lg);
+  background: var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-600);
+  font-size: 1.125rem;
+
+  [data-theme="dark"] & {
+    background: var(--dark-bg);
+    color: var(--dark-text-secondary);
+  }
+}
+
+.sidebar-footer-text {
+  flex: 1;
+
+  .footer-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 2px;
+
+    [data-theme="dark"] & {
+      color: var(--dark-text);
+    }
+  }
+
+  .footer-subtitle {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+
+    [data-theme="dark"] & {
+      color: var(--dark-text-secondary);
+    }
+  }
+}
+
+// Collapsed sidebar state
+.main-sidebar.collapsed {
+  width: 72px;
+
+  .sidebar-nav-text,
+  .sidebar-section-title,
+  .sidebar-footer-text {
+    display: none;
+  }
+
+  .sidebar-nav-link {
+    justify-content: center;
+    padding: var(--spacing-md) var(--spacing-sm);
+  }
+
+  .sidebar-header {
+    padding: var(--spacing-md) var(--spacing-sm);
+    text-align: center;
+  }
+
+  .sidebar-footer {
+    padding: var(--spacing-md) var(--spacing-sm);
+  }
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+  .main-sidebar {
+    transform: translateX(-100%);
+    width: 280px;
+
+    &.open {
+      transform: translateX(0);
+    }
+  }
+
+  .sidebar-overlay {
+    display: none;
+
+    &.active {
+      display: block;
+    }
+  }
+}
+
+// Animation for sidebar
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.main-sidebar.open {
+  animation: slideInLeft var(--transition-normal) ease-out;
+}
