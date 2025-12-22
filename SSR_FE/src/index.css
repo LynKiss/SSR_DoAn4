@@ -1,7 +1,4 @@
-/* Global styles */
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #f9fafb;
-  color: #333;
-}
+/* 
+ * This file is intentionally minimal
+ * All styles are now handled by the SCSS system in src/styles/
+ */

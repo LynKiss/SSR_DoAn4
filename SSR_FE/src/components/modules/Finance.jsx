@@ -1,4 +1,5 @@
 import useTheme from "../../hooks/useTheme";
+import "./shared.css";
 import "./Finance.css";
 
 const Finance = () => {

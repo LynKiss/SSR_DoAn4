@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useTheme from "../../hooks/useTheme";
+import "./shared.css";
 import "./Shipping.css";
 
 const Shipping = () => {
