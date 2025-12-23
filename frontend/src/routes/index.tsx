@@ -9,6 +9,7 @@ import { URLS } from "./urls";
 import Home from "@/modules/home/views/Home";
 import Customers from "@/modules/customers/views/Customers";
 import CustomerDetail from "@/modules/customers/views/CustomerDetail";
+import Products from "@/modules/products/views/Products";
 import Files from "@/modules/files/views/Files";
 import AuditLogs from "@/modules/audit-logs/views/AuditLogs";
 import StatusHistory from "@/modules/status/views/StatusHistory";
@@ -25,6 +26,7 @@ export default function AppRoutes() {
 
           <Route path={URLS.SALES_CUSTOMERS} element={<Customers />} />
           <Route path="/sales/customers/:id" element={<CustomerDetail />} />
+          <Route path={URLS.SALES_PRODUCTS} element={<Products />} />
 
           <Route path={URLS.FILES} element={<Files />} />
           <Route path={URLS.AUDIT_LOGS} element={<AuditLogs />} />

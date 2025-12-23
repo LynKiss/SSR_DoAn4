@@ -7,4 +7,6 @@ export const PERMS = {
   STATUS_READ: "status.read",
   FILES_READ: "files.read",
   FILES_WRITE: "files.write",
+  PRODUCT_READ: "product.read",
+  PRODUCT_WRITE: "product.write",
 } as const;
